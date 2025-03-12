@@ -3,6 +3,8 @@ package com.youssef.gamal.javers_auditing.controllers;
 import com.youssef.gamal.javers_auditing.entities.Post;
 import com.youssef.gamal.javers_auditing.services.PostService;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -56,8 +58,8 @@ public class PostController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/search")
-    public Page<Post> searchPosts(Pageable pageable) {
+    @GetMapping("/")
+    public Page<Post> searchPosts(@ParameterObject Pageable pageable) {
         log.info("Starting searchPosts with pageable: {}", pageable);
         Page<Post> posts = postService.searchPosts(pageable);
         log.info("Finished searchPosts with result: {}", posts);
