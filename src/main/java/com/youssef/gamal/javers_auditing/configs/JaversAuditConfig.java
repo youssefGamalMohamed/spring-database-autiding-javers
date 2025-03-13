@@ -1,9 +1,5 @@
 package com.youssef.gamal.javers_auditing.configs;
 
-import java.util.Map;
-
-import org.javers.spring.auditable.CommitPropertiesProvider;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
