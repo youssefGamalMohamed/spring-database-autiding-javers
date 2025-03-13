@@ -29,12 +29,10 @@
 	<properties>
 		<java.version>17</java.version>
 		<springdoc.openapi.version>2.8.5</springdoc.openapi.version>
+		<javers.version>7.8.0</javers.version>
 	</properties>
 	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jdbc</artifactId>
-		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -62,6 +60,19 @@
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>${springdoc.openapi.version}</version>
+		</dependency>
+
+
+		<!-- Javers Spring Boot Starter for SQL (Javers integration for JDBC) -->
+		<dependency>
+			<groupId>org.javers</groupId>
+			<artifactId>javers-spring-boot-starter-sql</artifactId>
+			<version>${javers.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 	</dependencies>
 
