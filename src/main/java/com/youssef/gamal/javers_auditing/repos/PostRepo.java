@@ -1,11 +1,14 @@
 package com.youssef.gamal.javers_auditing.repos;
 
-import org.springframework.data.repository.ListCrudRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import com.youssef.gamal.javers_auditing.entities.Post;
 
-public interface PostRepo extends ListCrudRepository<Post,Long> 
-    , PagingAndSortingRepository<Post,Long> {
+
+@JaversSpringDataAuditable
+@Repository
+public interface PostRepo extends JpaRepository<Post, Long> {
 
 }
