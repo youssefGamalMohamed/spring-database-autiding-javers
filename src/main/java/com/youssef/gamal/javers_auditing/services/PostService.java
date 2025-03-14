@@ -1,12 +1,18 @@
 package com.youssef.gamal.javers_auditing.services;
 
+import java.util.List;
 import java.util.Optional;
 
+import org.javers.core.Javers;
+import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.repository.jql.QueryBuilder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.youssef.gamal.javers_auditing.dtos.HistoryDto;
 import com.youssef.gamal.javers_auditing.entities.Post;
+import com.youssef.gamal.javers_auditing.mappers.HistoryMapper;
 import com.youssef.gamal.javers_auditing.mappers.PostMapper;
 import com.youssef.gamal.javers_auditing.repos.PostRepo;
 
@@ -21,6 +27,10 @@ public class PostService {
     private final PostRepo postRepo;
 
     private final PostMapper postMapper;
+
+    private final Javers javers;
+
+    private final HistoryMapper historyMapper;
 
     public Post createPost(Post post) {
         log.info("Starting createPost with post: {}", post);
@@ -58,5 +68,15 @@ public class PostService {
         Page<Post> posts = postRepo.findAll(pageable);
         log.info("Finished searchPosts with result: {}", posts);
         return posts;
+    }
+
+
+    // New method: Get audit history (snapshots) for a Post
+    public List<HistoryDto> getPostHistoryDto(Long postId) {
+        Post post = postRepo.findById(postId)
+                    .orElseThrow(() -> new RuntimeException("Post not found with id " + postId));
+        List<CdoSnapshot> snapshots = javers.findSnapshots(QueryBuilder.byInstance(post).build());
+        log.info("Retrieved Total Snapshots Size = {}", snapshots.size());
+        return (List<HistoryDto>) historyMapper.toHistoryDtos(snapshots);
     }
 }
