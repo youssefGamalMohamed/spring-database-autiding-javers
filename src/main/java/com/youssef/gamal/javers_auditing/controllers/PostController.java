@@ -1,9 +1,9 @@
 package com.youssef.gamal.javers_auditing.controllers;
-
+import com.youssef.gamal.javers_auditing.dtos.PostDto;
 import com.youssef.gamal.javers_auditing.entities.Post;
+import com.youssef.gamal.javers_auditing.mappers.PostMapper;
 import com.youssef.gamal.javers_auditing.services.PostService;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,29 +21,39 @@ public class PostController {
     @Autowired
     private PostService postService;
 
+    @Autowired
+    private PostMapper postMapper;
+
     @PostMapping
-    public Post createPost(@RequestBody Post post) {
-        log.info("Starting createPost with post: {}", post);
-        Post createdPost = postService.createPost(post);
+    public PostDto createPost(@RequestBody PostDto postDto) {
+        log.info("Starting createPost with postDto: {}", postDto);
+        // Convert DTO to entity
+        Post postEntity = postMapper.toEntity(postDto);
+        // Call service layer to persist the entity
+        Post createdPost = postService.createPost(postEntity);
         log.info("Finished createPost with result: {}", createdPost);
-        return createdPost;
+        // Convert the entity back to DTO for the response
+        return postMapper.toDto(createdPost);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Post> getPostById(@PathVariable Long id) {
+    public ResponseEntity<PostDto> getPostById(@PathVariable Long id) {
         log.info("Starting getPostById with id: {}", id);
-        Optional<Post> post = postService.getPostById(id);
-        log.info("Finished getPostById with result: {}", post);
-        return post.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        Optional<Post> postOpt = postService.getPostById(id);
+        log.info("Finished getPostById with result: {}", postOpt);
+        return postOpt
+                .map(post -> ResponseEntity.ok(postMapper.toDto(post)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Post> updatePost(@PathVariable Long id, @RequestBody Post postDetails) {
-        log.info("Starting updatePost with id: {} and postDetails: {}", id, postDetails);
+    public ResponseEntity<PostDto> updatePost(@PathVariable Long id, @RequestBody PostDto postDto) {
+        log.info("Starting updatePost with id: {} and postDto: {}", id, postDto);
         try {
-            Post updatedPost = postService.updatePost(id, postDetails);
+            Post postEntity = postMapper.toEntity(postDto);
+            Post updatedPost = postService.updatePost(id, postEntity);
             log.info("Finished updatePost with result: {}", updatedPost);
-            return ResponseEntity.ok(updatedPost);
+            return ResponseEntity.ok(postMapper.toDto(updatedPost));
         } catch (RuntimeException e) {
             log.error("Error in updatePost: {}", e.getMessage());
             return ResponseEntity.notFound().build();
@@ -59,10 +69,12 @@ public class PostController {
     }
 
     @GetMapping("/")
-    public Page<Post> searchPosts(@ParameterObject Pageable pageable) {
+    public Page<PostDto> searchPosts(@ParameterObject Pageable pageable) {
         log.info("Starting searchPosts with pageable: {}", pageable);
         Page<Post> posts = postService.searchPosts(pageable);
-        log.info("Finished searchPosts with result: {}", posts);
-        return posts;
+        // Map each Post entity to a PostDto
+        Page<PostDto> postDtos = posts.map(postMapper::toDto);
+        log.info("Finished searchPosts with result: {}", postDtos);
+        return postDtos;
     }
 }
