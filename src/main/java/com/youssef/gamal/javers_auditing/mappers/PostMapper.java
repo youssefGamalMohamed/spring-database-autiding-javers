@@ -5,6 +5,7 @@ import org.mapstruct.Mapper;
 import com.youssef.gamal.javers_auditing.entities.Post;
 import com.youssef.gamal.javers_auditing.dtos.PostDto;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
@@ -26,4 +27,15 @@ public interface PostMapper {
     @Mapping(target = "lastModifiedBy", ignore = true)
     @Mapping(target = "id", ignore = true)
     Post toEntity(PostDto postDto);
+
+
+    
+    // Update the target Post entity with values from the source Post.
+    // Auditing fields and id are ignored.
+    @Mapping(target = "creationDate", ignore = true)
+    @Mapping(target = "createdBy", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
+    @Mapping(target = "lastModifiedBy", ignore = true)
+    @Mapping(target = "id", ignore = true)
+    void updateFrom(Post source, @MappingTarget Post target);
 }
