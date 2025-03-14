@@ -1,21 +1,26 @@
 package com.youssef.gamal.javers_auditing.services;
 
-import com.youssef.gamal.javers_auditing.entities.Post;
-import com.youssef.gamal.javers_auditing.repos.PostRepo;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import com.youssef.gamal.javers_auditing.entities.Post;
+import com.youssef.gamal.javers_auditing.mappers.PostMapper;
+import com.youssef.gamal.javers_auditing.repos.PostRepo;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class PostService {
 
-    @Autowired
-    private PostRepo postRepo;
+    private final PostRepo postRepo;
+
+    private final PostMapper postMapper;
 
     public Post createPost(Post post) {
         log.info("Starting createPost with post: {}", post);
@@ -33,11 +38,11 @@ public class PostService {
 
     public Post updatePost(Long id, Post postDetails) {
         log.info("Starting updatePost with id: {} and postDetails: {}", id, postDetails);
-        Post updatedPost = postRepo.findById(id).map(post -> {
-            post.setTitle(postDetails.getTitle());
-            post.setContent(postDetails.getContent());
-            return postRepo.save(post);
-        }).orElseThrow(() -> new RuntimeException("Post not found with id " + id));
+        Post existingPost = postRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Post not found with id " + id));
+        // Use the mapper to update the entity
+        postMapper.updateFrom(postDetails, existingPost);
+        Post updatedPost = postRepo.save(existingPost);
         log.info("Finished updatePost with result: {}", updatedPost);
         return updatedPost;
     }
