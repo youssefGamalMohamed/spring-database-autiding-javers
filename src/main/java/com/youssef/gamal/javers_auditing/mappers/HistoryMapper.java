@@ -18,6 +18,7 @@ public interface HistoryMapper {
     @Mapping(target = "version", source = "version")
     @Mapping(target = "changedFieldsNames", source = "changed")
     @Mapping(target = "state", expression = "java(convertStateToMap(javerSnapShot.getState()))")
+    @Mapping(target = "operationType" , source = "type")
     HistoryDto toHistoryDto(CdoSnapshot javerSnapShot);
 
 

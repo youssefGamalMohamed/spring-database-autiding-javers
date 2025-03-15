@@ -1,7 +1,9 @@
 package com.youssef.gamal.javers_auditing.services;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
@@ -27,7 +29,10 @@ public class JaversHistoryServiceImpl implements HistoryServiceIfc {
         log.info("getHistoryOf(class_type = {}, id = {})", clazz.toString(), id);
         List<CdoSnapshot> snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(id, clazz).build());
         log.info("Retrieved Total Snapshots Size = {}", snapshots.size());
-        return historyMapper.toHistoryDtos(snapshots);
+        Collection<HistoryDto> history = historyMapper.toHistoryDtos(snapshots);
+        return history.stream()
+                      .sorted(Comparator.comparing(HistoryDto::version))
+                      .collect(Collectors.toList());
     }
 
 }

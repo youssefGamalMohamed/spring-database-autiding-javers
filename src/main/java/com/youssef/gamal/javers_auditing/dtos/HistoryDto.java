@@ -6,5 +6,5 @@ import java.util.Map;
 import lombok.Builder;
 
 @Builder
-public record HistoryDto(Long version, List<String> changedFieldsNames, Map<String,Object> state) {
+public record HistoryDto(Long version, List<String> changedFieldsNames, Map<String,Object> state, String operationType) {
 }
