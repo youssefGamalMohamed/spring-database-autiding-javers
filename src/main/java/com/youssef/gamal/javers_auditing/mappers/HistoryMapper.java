@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.CdoSnapshotState;
+import org.javers.core.metamodel.object.SnapshotType;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -18,7 +19,7 @@ public interface HistoryMapper {
     @Mapping(target = "version", source = "version")
     @Mapping(target = "changedFieldsNames", source = "changed")
     @Mapping(target = "state", expression = "java(convertStateToMap(javerSnapShot.getState()))")
-    @Mapping(target = "operationType" , source = "type")
+    @Mapping(target = "operationType" , expression = "java(convertOperationTypeToReadableName(javerSnapShot.getType()))")
     HistoryDto toHistoryDto(CdoSnapshot javerSnapShot);
 
 
@@ -35,4 +36,14 @@ public interface HistoryMapper {
                 ));
     }
 
+
+    default String convertOperationTypeToReadableName(SnapshotType type) {
+        if(type.equals(SnapshotType.INITIAL))
+            return "CREATED";
+        if(type.equals(SnapshotType.UPDATE))
+            return "UPDATED";
+        if(type.equals(SnapshotType.TERMINAL))
+            return "DELETED";
+        throw new IllegalArgumentException("Javer Type Is Not Supported");
+    }
 }
